@@ -1,3 +1,4 @@
+
 // Steps to complete:
 
 // 1. Initialize Firebase
@@ -24,10 +25,23 @@
 
   var database = firebase.database();
 
-  //Grab user input
-  var trainName = $("#train-name-input").val().trim();
-  var destination =$("#finalStop-input").val().trim();
-  var firstTrain=$("#firstArrival-input").val().trim();
-  var frequency =$("#frequency-input").val().trin();
-  
+  // 2. Button for adding trains
+  $("#add-train-btn").on("click", function(event) { 
 
+    event.preventDefault();
+    
+    
+    //Grab user input
+    var trainName = $("#train-name-input").val();
+    var destination =$("#finalStop-input").val();
+    var firstTrain=$("#firstArrival-input").val();
+    var frequency =$("#frequency-input").val();
+    
+    var newTrain = {
+      name: trainName,
+      finalStop: destination,
+      firstArrival: firstTrain,
+      freq: frequency
+    };
+  });
+  

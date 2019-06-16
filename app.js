@@ -43,5 +43,31 @@
       firstArrival: firstTrain,
       freq: frequency
     };
+    console.log(trainName);
+    //debugger;
+  // Uploads train data to the database
+    database.ref().set(newTrain);
+  
+    // Clear all text-box inputs
+    $("#train-name-input").val("");
+    $("#finalStop-input").val("");
+    $("#firstArrival-input").val("");
+    $("#frequency-input").val("");
+
   });
+  // Create firebase event for adding employee to the database and a row in the html when a user adds an entry
+  database.ref().on("child_added",function(childSnapshot){
+    console.log(childSnapshot.val());
+
+    // store everything into a variable
+    var tName = ChildSnapshot.val().name;
+    var final = ChildSnapshot.val().finalStop;
+    var arrive = ChildSnapshot.val().firstArrival;
+    var periodicity = ChildSnapshot.val().freq;
+    console.log(tName);
+    console.log(final);
+    console.log(arrive);
+    console.log(periodicity);
+
+  })
   

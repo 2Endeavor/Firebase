@@ -1,0 +1,15 @@
+h3 {
+  color: purple;
+}
+
+.entryForm {
+  padding: 50px;
+}
+
+.form-group{
+  padding: 20px;
+}
+
+#add-train-btn{
+  margin-left: 20px;
+}

@@ -1,16 +1,5 @@
-
-// Steps to complete:
-
-// 1. Initialize Firebase
-// 2. Create button for adding new employees - then update the html + update the database
-// 3. Create a way to retrieve employees from the employee database.
-// 4. Create a way to calculate the months worked. Using difference between start and current time.
-//    Then use moment.js formatting to set difference in months.
-// 5. Calculate Total billed
-
-// 1. Initialize Firebase
-
-  // Your web app's Firebase configuration
+$(document).ready(function() {
+  // create Firebase configuration
   var firebaseConfig = {
     apiKey: "AIzaSyB6bcCVY7JZLr-zjUpOgAGOgdgGs365C4s",
     authDomain: "train-tracker-3c3a7.firebaseapp.com",
@@ -24,30 +13,90 @@
   firebase.initializeApp(firebaseConfig);
 
   var database = firebase.database();
+  // Create firebase event listener for adding trains to the database and a row in the html when a user adds an entry
+  database.ref().on("child_added", function(childSnapshot) {
+    // reduce typing by storing childSnapshot.val() to a variable
+    var snap = childSnapshot.val();
 
-  // 2. Button for adding trains
-  $("#add-train-btn").on("click", function(event) { 
+    var firstTime = snap.firstArrival;
+    // console.log("snap.first arrival " + snap.firstArrival);
+    // console.log("firstTime = " + firstTime);
 
+    // create times for the reader board
+    var firstArrival = moment.unix(firstTime).format("hh:mm");
+    var firstTimeConverted = moment(firstArrival, "HH:mm").subtract(1, "years");
+    //calculate difference between times
+    console.log("firstArrival " + firstArrival);
+    var difference = moment().diff(moment(firstTimeConverted), "minutes");
+    console.log ("difference " + difference);
+
+   // time apart remainder
+    var trainRemain = difference % snap.freq;
+    console.log ("trainRemain " + trainRemain);
+
+    // minutes until arrival
+    var minUntil = snap.freq - trainRemain;
+    console.log ("minUntil " + minUntil);
+
+    //next arrival time
+    var nextArrival = moment()
+      .add(minUntil, "minutes")
+      .format("hh:mm");
+      console.log("nextArrival" + nextArrival)
+
+    // Adding the informaiton to the DOM
+    var newRow = $("<tr>").append(
+      $("<td>").text(snap.name),
+      $("<td>").text(snap.finalStop),
+      $("<td>").text(snap.freq),
+      $("<td>").text(nextArrival),
+      $("<td>").text(minUntil)
+    );
+    $("tbody").append(newRow);
+  });
+  
+  // Add Button for adding trains
+  $("#add-train-btn").on("click", function(event) {
+    // prevent automated page reload
     event.preventDefault();
-    
-    
-    //Grab user input
-    var trainName = $("#train-name-input").val();
-    var destination =$("#finalStop-input").val();
-    var firstTrain=$("#firstArrival-input").val();
-    var frequency =$("#frequency-input").val();
-    
+
+    //Grab user input require for the reader board
+    var trainName = $("#train-name-input")
+      .val()
+      .trim();
+    var destination = $("#finalStop-input")
+      .val()
+      .trim();
+
+    //convert user input into required information
+    var firstTrain = moment(
+      $("#firstArrival-input")
+        .val()
+        .trim(),
+      "hh:mm"
+    )
+      .subtract(1, "years")
+      .format("X");
+
+    var frequency = $("#frequency-input")
+      .val()
+      .trim();
+
+    // current time
+    var currentTime = moment();
+    moment(currentTime).format("hh:mm");
+
+    // Create the new train object that will be stored in the database
     var newTrain = {
       name: trainName,
       finalStop: destination,
       firstArrival: firstTrain,
       freq: frequency
     };
-    console.log(trainName);
-    //debugger;
-  // Uploads train data to the database
-    database.ref().set(newTrain);
-  
+
+    // Uploads train data to the database
+    database.ref().push(newTrain);
+
     // Clear all text-box inputs
     $("#train-name-input").val("");
     $("#finalStop-input").val("");
@@ -55,19 +104,6 @@
     $("#frequency-input").val("");
 
   });
-  // Create firebase event for adding employee to the database and a row in the html when a user adds an entry
-  database.ref().on("child_added",function(childSnapshot){
-    console.log(childSnapshot.val());
 
-    // store everything into a variable
-    var tName = ChildSnapshot.val().name;
-    var final = ChildSnapshot.val().finalStop;
-    var arrive = ChildSnapshot.val().firstArrival;
-    var periodicity = ChildSnapshot.val().freq;
-    console.log(tName);
-    console.log(final);
-    console.log(arrive);
-    console.log(periodicity);
-
-  })
-  
+  //end document ready function
+});
